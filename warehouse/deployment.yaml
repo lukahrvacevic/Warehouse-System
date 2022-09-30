@@ -1,0 +1,117 @@
+version: '3'
+
+services:
+
+  warehouseDB:
+    image: mysql
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+    - warehousedbdata:/var/lib/mysql
+    networks:
+      - customer_db
+      - admin_db
+      - daemon_db
+      - migration_db
+
+  warehouseDBMigration:
+    image: warehousedbmigration
+    environment:
+      - DATABASE_URL=warehouseDB
+    networks:
+      - migration_db
+
+  adminer:
+    image: adminer
+    ports:
+      - 8081:8080
+    networks:
+      - daemon_db
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    networks:
+      - daemon_redis
+      - warehouse_redis
+
+  warehouseman:
+    image: warehouseman
+    ports:
+      - 5003:5003
+    networks:
+      - warehouse_redis
+
+  buyer:
+    image: buyer
+    ports:
+      - 5004:5004
+    networks:
+      - customer_db
+    environment:
+      - DATABASE_URL=warehouseDB
+
+  admin:
+    image: admin
+    ports:
+      - 5005:5005
+    networks:
+      - admin_db
+    environment:
+      - DATABASE_URL=warehouseDB
+
+  daemon:
+    image: daemon
+    environment:
+      - DATABASE_URL=warehouseDB
+    networks:
+      - daemon_db
+      - daemon_redis
+
+  authenticationDB:
+    image: mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - authenticationdbdata:/var/lib/mysql
+    networks:
+      - mynet
+
+  authenticationDBMigration:
+      image: authenticationdbmigration
+      environment:
+        - DATABASE_URL=authenticationDB
+      networks:
+        - mynet
+
+  authentication:
+      image: authentication
+      environment:
+        - DATABASE_URL=authenticationDB
+      ports:
+        - 5002:5002
+      networks:
+        - mynet
+
+  adminer2:
+      image: adminer
+      ports:
+        - 8080:8080
+      networks:
+        - mynet
+
+volumes:
+  warehousedbdata:
+  authenticationdbdata:
+
+networks:
+  customer_db:
+  admin_db:
+  daemon_db:
+  daemon_redis:
+  warehouse_redis:
+  migration_db:
+  mynet:
