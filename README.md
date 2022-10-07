@@ -1,7 +1,7 @@
 # Warehouse-System
 
-University project for a made-up warehouse system which had the goal
-to practice implementing web services for a system as well as
+University project for a made-up warehouse system which was done with the intention of
+practicing implementation of web services for a system as well as
 running a system using a tool for orchestrating containers(Docker).
 
 Main tools that were used are Python with Flask and SQLAlchemy
